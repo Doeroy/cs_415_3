@@ -19,19 +19,50 @@ pthread_mutex_t ticket_booth_mutex = PTHREAD_MUTEX_INITIALIZER; //mutex at the t
 
 pthread_mutex_t ride_queue_mutex = PTHREAD_MUTEX_INITIALIZER; //mutex for the ride queue
 
+pthread_mutex_t board_counter_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+pthread_mutex_t unboard_counter_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+int passengers_boarded;
+
+int passengers_unboarded;
 
 sem_t load_sem;
 
 sem_t unload_sem;
+
+sem_t * allAboard;
+
+sem_t * allUnboarded; 
+
+sem_t * loading_area;
+
+sem_t * unloading_area;
+
+sem_t ride_finished;
 
 int main(int argc, char * argv[]){
     int opt;
     int num_passengers = 1;
     int num_cars = 1;
     int cap_cars = 5;
-    int wait_period = 1;
+    int wait_period = 3;
     int ride_duration = 1;
 	sem_init(&load_sem, 0, 0);
+	sem_init(&unload_sem, 0, 0);
+	sem_init(&allAboard, 0, 0);
+	sem_init(&allUnboarded, 0, 0);
+	sem_init(&ride_finished, 0, 0);
+	loading_area = (sem_t *)malloc(sizeof(sem_t) * num_cars);
+	unloading_area = (sem_t *)malloc(sizeof(sem_t) * num_cars);
+
+	for(int i = 0; i < num_cars; i++)
+	{
+		sem_init(&loading_area[i], 0, 0);
+		sem_init(&unloading_area, 0, 0);
+	}
+	sem_post(&loading_area[0]);
+	sem_post(&unloading_area[0]);
 	ticket_queue = createQueue();
 	ride_queue = createQueue();
 	start_time = time(NULL);
@@ -81,6 +112,7 @@ int main(int argc, char * argv[]){
 	for(int i = 0; i < num_passengers; i++){
 		passenger_info * info = (passenger_info *)malloc(sizeof(passenger_info)); 
 		info->passenger_num = i + 1;
+		info->car_capacity = cap_cars;
 		pthread_create(&passenger_id_arr[i], NULL, passenger_func, (void*)(info));
 	}
 
@@ -89,6 +121,9 @@ int main(int argc, char * argv[]){
 		car_info * info = (car_info *)malloc(sizeof(car_info)); 
 		info->car_capacity = cap_cars;
 		info->ride_duration = ride_duration;
+		info->wait_period = wait_period;
+		info -> car_id = i + 1;
+		info -> total_passengers = num_passengers;
 		pthread_create(&car_id_arr[i], NULL, car_func, (void*)(info));
 	}
 
@@ -103,6 +138,16 @@ int main(int argc, char * argv[]){
 	pthread_mutex_destroy(&ticket_queue_mutex);
 	pthread_mutex_destroy(&ticket_booth_mutex);
 	pthread_mutex_destroy(&ride_queue_mutex);
+	sem_destroy(&load_sem);
+	sem_destroy(&unload_sem);
+	sem_destroy(&allAboard);
+	sem_destroy(&allUnboarded);
+	sem_destroy(&ride_finished);
+
+	free(loading_area);
+	free(unloading_area);
+	//free(allAboard_sems);
+	//free(allUnboarded_sems);
 	free(passenger_id_arr);
 	free(car_id_arr);
 	free(ticket_queue);

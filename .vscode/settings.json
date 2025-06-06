@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "threads.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "functional": "c"
     }
 }
