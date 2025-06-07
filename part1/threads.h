@@ -35,5 +35,4 @@ void unboard(int total_passengers);
 
 void run(int ride_duration);
 
-
 #endif 

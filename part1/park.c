@@ -9,40 +9,21 @@
 
 time_t start_time; 
 
-Queue* ticket_queue;
-
 Queue* ride_queue;
 
-pthread_mutex_t ticket_queue_mutex = PTHREAD_MUTEX_INITIALIZER; //mutex for ticket queue
+int boarders = 0;
 
-pthread_mutex_t ticket_booth_mutex = PTHREAD_MUTEX_INITIALIZER; //mutex at the ticket booth
+int unboarders = 0;
 
-pthread_mutex_t ride_queue_mutex = PTHREAD_MUTEX_INITIALIZER; //mutex for the ride queue
+sem_t boardQueue;
 
-pthread_mutex_t board_counter_mutex = PTHREAD_MUTEX_INITIALIZER;
+sem_t unboardQueue;
 
-pthread_mutex_t unboard_mutex = PTHREAD_MUTEX_INITIALIZER;
+sem_t allAboard; //binary semaphore to signal that the car is full
 
-pthread_mutex_t car_mutex = PTHREAD_MUTEX_INITIALIZER;
+sem_t allAshore; //binary semaphore to signal that all passengers have left the car
 
-int passengers_boarded;
-
-int passengers_unboarded;
-
-sem_t load_sem; //only one car is allowed to load at a time so this doesn't need to be an array. this controls how many pasengers can board a car
-
-sem_t unload_sem; //same as load_sem
-
-sem_t * allAboard; //controls which car gets to use the boarding area. the array ensures that the correct car is signaled
-
-sem_t * allUnboarded; //when a passengers get off of a car it will signal allUnboarded[i] so car i knows a passenger unboarded
-
-sem_t * loading_area;
-
-sem_t * unloading_area;
-
-sem_t ride_finished;
-
+sem_t boarding;
 int main(int argc, char * argv[]){
     int opt;
     int num_passengers = 1;
@@ -50,10 +31,10 @@ int main(int argc, char * argv[]){
     int cap_cars = 5;
     int wait_period = 3;
     int ride_duration = 1;
-	sem_init(&load_sem, 0, 0);
-	sem_init(&unload_sem, 0, 0);
-	sem_init(&ride_finished, 0, 0);
-	ticket_queue = createQueue();
+	sem_init(&boardQueue, 0, 0);
+	sem_init(&unboardQueue, 0, 0);
+	sem_init(&allAboard, 0, 0);
+    sem_init(&allAshore, 0, 0);
 	ride_queue = createQueue();
 	start_time = time(NULL);
 	srand(time(NULL));
@@ -90,21 +71,6 @@ int main(int argc, char * argv[]){
 	printf("Given extra arguments: %s\n", argv[optind]);
     }
 
-	allAboard = (sem_t *)malloc(sizeof(sem_t) * num_cars);
-	allUnboarded = (sem_t *)malloc(sizeof(sem_t) * num_cars);
-	loading_area = (sem_t *)malloc(sizeof(sem_t) * num_cars);
-	unloading_area = (sem_t *)malloc(sizeof(sem_t) * num_cars);
-
-	for(int i = 0; i < num_cars; i++)
-	{
-		sem_init(&loading_area[i], 0, 0);
-		sem_init(&unloading_area[i], 0, 0);
-		sem_init(&allAboard[i], 0, 0);
-		sem_init(&allUnboarded[i], 0, 0);
-	}
-	sem_post(&loading_area[0]);
-	sem_post(&unloading_area[0]);
-	
     printf("===== DUCK PARK SIMULATION =====\n");
     printf("[Monitor] Simulation started with parameters:\n");
     printf("- Number of passenger threads: %d\n", num_passengers);
@@ -127,9 +93,8 @@ int main(int argc, char * argv[]){
 		info->car_capacity = cap_cars;
 		info->ride_duration = ride_duration;
 		info->wait_period = wait_period;
-		info -> car_id = i;
+		info -> car_id = i + 1;
 		info -> total_passengers = num_passengers;
-		info -> total_amt_cars = num_cars;
 		pthread_create(&car_id_arr[i], NULL, car_func, (void*)(info));
 	}
 
@@ -141,21 +106,14 @@ int main(int argc, char * argv[]){
 		pthread_join(car_id_arr[j], NULL);
 	}
 
-	pthread_mutex_destroy(&ticket_queue_mutex);
-	pthread_mutex_destroy(&ticket_booth_mutex);
-	pthread_mutex_destroy(&ride_queue_mutex);
-	sem_destroy(&load_sem);
-	sem_destroy(&unload_sem);
-	sem_destroy(allAboard);
-	sem_destroy(allUnboarded);
-	sem_destroy(&ride_finished);
-
-	free(loading_area);
-	free(unloading_area);
+	sem_destroy(&boardQueue);
+	sem_destroy(&unboardQueue);
+	sem_destroy(&allAboard);
+	sem_destroy(&allAboard);
+	sem_destroy(&allAshore);
 	//free(allAboard_sems);
 	//free(allUnboarded_sems);
 	free(passenger_id_arr);
 	free(car_id_arr);
-	free(ticket_queue);
 	free(ride_queue);
 }   

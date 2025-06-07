@@ -2,6 +2,7 @@
     "files.associations": {
         "threads.h": "c",
         "time.h": "c",
-        "functional": "c"
+        "functional": "c",
+        "stdlib.h": "c"
     }
 }
