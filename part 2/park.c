@@ -20,11 +20,10 @@ Car* cars = NULL;
 
 void signal_handler(int signum) {
     if (signum == SIGINT) {
-        if (shutdown_flag) { // Force exit on second Ctrl+C
+        if (shutdown_flag) { 
             fprintf(stderr, "\nForcing shutdown...\n");
             exit(1);
         }
-        printf("\nCtrl+C detected. Shutting down simulation gracefully...\n");
         shutdown_flag = 1;
 
         // Wake up ALL potentially sleeping threads
@@ -124,7 +123,6 @@ int main(int argc, char* argv[]) {
         pthread_create(&c_threads[i], NULL, car_func, c_info);
     }
     
-    printf("\nSimulation running... Press Ctrl+C to exit.\n");
     for (int i = 0; i < num_passengers; i++) {
         pthread_join(p_threads[i], NULL);
     }
@@ -132,7 +130,6 @@ int main(int argc, char* argv[]) {
         pthread_join(c_threads[i], NULL);
     }
     
-    printf("All threads have exited. Cleaning up resources.\n");
     pthread_mutex_destroy(&loading_bay_lock);
     ordered_mutex_destroy(&unloading_turnstile);
     ordered_mutex_destroy(&ticket_queue_lock);
@@ -144,7 +141,5 @@ int main(int argc, char* argv[]) {
         pthread_cond_destroy(&cars[i].cond_passenger_unboarded);
     }
     free(cars);
-
-    printf("Cleanup complete.\n");
     return 0;
 }

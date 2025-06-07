@@ -32,7 +32,6 @@ void signal_handler(int signum) {
             fprintf(stderr, "\nForcing exit...\n");
             exit(1);
         }
-        printf("\nCtrl+C detected. Shutting down simulation gracefully...\n");
         shutdown_flag = 1;
 
         ordered_mutex_broadcast(&ticket_queue_lock);
@@ -199,7 +198,6 @@ int main(int argc, char* argv[]) {
         pthread_create(&c_threads[i], NULL, car_func, c_info);
     }
     
-    printf("\nSimulation running... Press Ctrl+C to exit.\n");
     for (int i = 0; i < num_passengers; i++) {
         pthread_join(p_threads[i], NULL);
     }
@@ -210,7 +208,6 @@ int main(int argc, char* argv[]) {
     kill(pid, SIGKILL);
     wait(NULL);
     
-    printf("All threads have exited. Cleaning up resources.\n");
     pthread_mutexattr_destroy(&pshared_attr);
     pthread_mutex_destroy(&shared_state->lock);
     pthread_mutex_destroy(&loading_bay_lock);
@@ -226,6 +223,5 @@ int main(int argc, char* argv[]) {
     free(cars);
     munmap(shared_state, sizeof(Shared_State));
 
-    printf("Cleanup complete.\n");
     return 0;
 }

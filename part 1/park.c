@@ -24,7 +24,6 @@ void signal_handler(int signum) {
             fprintf(stderr, "\nForcing shutdown...\n");
             exit(1);
         }
-        printf("\nCtrl+C detected. Shutting down simulation gracefully...\n");
         shutdown_flag = 1;
 
         // Wake up ALL potentially sleeping threads
@@ -124,7 +123,6 @@ int main(int argc, char* argv[]) {
         pthread_create(&c_threads[i], NULL, car_func, c_info);
     }
     
-    printf("\nSimulation running... Press Ctrl+C to exit.\n");
     for (int i = 0; i < num_passengers; i++) {
         pthread_join(p_threads[i], NULL);
     }
