@@ -1,0 +1,53 @@
+==1990547== Memcheck, a memory error detector
+==1990547== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==1990547== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==1990547== Command: ./park
+==1990547== 
+===== DUCK PARK SIMULATION (Part 2) =====
+  - Number of passenger threads: 8
+  - Number of cars: 3
+  - Capacity per car: 4
+  - Car waiting period: 10 seconds
+  - Ride duration: 5 seconds
+
+
+Simulation running... Press Ctrl+C to exit.
+[Time: 00:00:00] Passenger 3 entered the park.
+[Time: 00:00:00] Passenger 3 is exploring...
+[Time: 00:00:00] Passenger 2 entered the park.
+[Time: 00:00:00] Passenger 2 is exploring...
+[Time: 00:00:00] Passenger 8 entered the park.
+[Time: 00:00:00] Passenger 8 is exploring...
+[Time: 00:00:00] Car 1 is in the loading bay (waiting 10s).
+[Time: 00:00:00] Passenger 5 entered the park.
+[Time: 00:00:00] Passenger 5 is exploring...
+[Time: 00:00:00] Passenger 7 entered the park.
+[Time: 00:00:00] Passenger 7 is exploring...
+[Time: 00:00:00] Passenger 4 entered the park.
+[Time: 00:00:00] Passenger 4 is exploring...
+[Time: 00:00:00] Passenger 6 entered the park.
+[Time: 00:00:00] Passenger 6 is exploring...
+[Time: 00:00:00] Passenger 1 entered the park.
+[Time: 00:00:00] Passenger 1 is exploring...
+[Time: 00:00:03] Passenger 3 waiting for ticket.
+[Time: 00:00:03] Passenger 3 got a ticket.
+[Time: 00:00:03] Passenger 3 joined the ride queue.
+[Time: 00:00:03] Passenger 3 boarded Car 1.
+[Time: 00:00:03] Passenger 5 waiting for ticket.
+[Time: 00:00:03] Passenger 5 got a ticket.
+[Time: 00:00:03] Passenger 5 joined the ride queue.
+[Time: 00:00:03] Passenger 5 boarded Car 1.
+
+Ctrl+C detected. Shutting down simulation gracefully...
+[Time: 00:00:04] Car 1 departed with 2 passengers.
+All threads have exited. Cleaning up resources.
+Cleanup complete.
+==1990547== 
+==1990547== HEAP SUMMARY:
+==1990547==     in use at exit: 0 bytes in 0 blocks
+==1990547==   total heap usage: 24 allocs, 24 frees, 11,872 bytes allocated
+==1990547== 
+==1990547== All heap blocks were freed -- no leaks are possible
+==1990547== 
+==1990547== For lists of detected and suppressed errors, rerun with: -s
+==1990547== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
